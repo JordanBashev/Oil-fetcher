@@ -21,7 +21,7 @@ cp backend/.env.example backend/.env
 
 Edit `backend/.env` and set:
 
-- `EIA_API_KEY` — get one free at <https://www.eia.gov/opendata/register.php>. A working dev key is also kept at `./apiKeyEIAGOV` in this repo.
+- `EIA_API_KEY` — get one free at <https://www.eia.gov/opendata/register.php>.
 - `SECRET_KEY` — any long random string.
 
 ### 2. Start the stack
