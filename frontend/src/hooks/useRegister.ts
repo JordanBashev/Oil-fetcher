@@ -8,6 +8,7 @@ export function useRegister() {
   return useMutation({
     mutationFn: (credentials: Credentials) => registerRequest(credentials),
     onSuccess: (data: AuthSuccess) => {
+      queryClient.clear();
       queryClient.setQueryData(SESSION_QUERY_KEY, data);
     },
   });

@@ -8,8 +8,8 @@ export function useLogout() {
   return useMutation({
     mutationFn: logoutRequest,
     onSuccess: () => {
+      queryClient.clear();
       queryClient.setQueryData(SESSION_QUERY_KEY, null);
-      queryClient.removeQueries({ queryKey: ["profile"] });
     },
   });
 }

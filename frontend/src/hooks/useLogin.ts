@@ -8,6 +8,7 @@ export function useLogin() {
   return useMutation({
     mutationFn: (credentials: Credentials) => loginRequest(credentials),
     onSuccess: (data: AuthSuccess) => {
+      queryClient.clear();
       queryClient.setQueryData(SESSION_QUERY_KEY, data);
     },
   });
