@@ -93,9 +93,10 @@ export async function getForecastRequest(forecastId: string): Promise<ForecastJo
 
 export async function getLatestMatchingForecastRequest(
   target: ForecastTarget,
+  forecastModel?: ForecastModel,
 ): Promise<ForecastJob | null> {
   const { data } = await apiClient.get<ForecastJob | null>("/forecasts/latest-matching", {
-    params: target,
+    params: { ...target, forecast_model: forecastModel },
   });
   return data;
 }

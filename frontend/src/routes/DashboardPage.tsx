@@ -15,7 +15,7 @@ import {
 } from "@mantine/core";
 import dayjs from "dayjs";
 
-import type { ForecastTarget } from "@/api/forecasts";
+import { FORECAST_MODEL, type ForecastModel, type ForecastTarget } from "@/api/forecasts";
 import type { OilPriceFilters } from "@/api/oil";
 import { HistoryAndForecastChart } from "@/components/forecasts/HistoryAndForecastChart";
 import { useLatestMatchingForecast } from "@/hooks/useForecasts";
@@ -37,6 +37,11 @@ const VIEW_PRESETS = [
   { value: VIEW_PRESET_3M, label: "3 months" },
   { value: VIEW_PRESET_3W, label: "3 weeks" },
   { value: VIEW_PRESET_WEEK, label: "This week" },
+];
+
+const FORECAST_MODEL_OPTIONS = [
+  { value: FORECAST_MODEL.HOLT_WINTERS_V1, label: "Holt-Winters" },
+  { value: FORECAST_MODEL.LINEAR_REGRESSION_V1, label: "Linear Regression" },
 ];
 
 const ISO_DATE_FORMAT = "YYYY-MM-DD";
@@ -66,12 +71,19 @@ export function DashboardPage() {
   const [selectedSeriesId, setSelectedSeriesId] = useState<string | null>(null);
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
   const [viewPreset, setViewPreset] = useState<string>(VIEW_PRESET_1Y);
+  const [selectedModel, setSelectedModel] = useState<ForecastModel>(FORECAST_MODEL.HOLT_WINTERS_V1);
 
   useEffect(() => {
     if (selectedUnit === null && unitsQuery.data && unitsQuery.data.length > 0) {
       setSelectedUnit(unitsQuery.data[0]);
     }
   }, [unitsQuery.data, selectedUnit]);
+
+  useEffect(() => {
+    if (selectedSeriesId === null && seriesQuery.data && seriesQuery.data.length > 0) {
+      setSelectedSeriesId(seriesQuery.data[0].id);
+    }
+  }, [seriesQuery.data, selectedSeriesId]);
 
   const target: ForecastTarget = useMemo(() => {
     if (targetMode === TARGET_MODE_SINGLE && selectedSeriesId) {
@@ -93,7 +105,7 @@ export function DashboardPage() {
   }, [target, viewPreset]);
 
   const pricesQuery = useOilPrices(filters);
-  const latestForecastQuery = useLatestMatchingForecast(target, targetReady);
+  const latestForecastQuery = useLatestMatchingForecast(target, targetReady, selectedModel);
   const latestForecast = latestForecastQuery.data ?? null;
 
   const seriesOptions = useMemo(
@@ -156,6 +168,13 @@ export function DashboardPage() {
             data={VIEW_PRESETS}
             value={viewPreset}
             onChange={(nextValue) => nextValue && setViewPreset(nextValue)}
+          />
+
+          <Select
+            label="Forecast model"
+            data={FORECAST_MODEL_OPTIONS}
+            value={selectedModel}
+            onChange={(nextValue) => nextValue && setSelectedModel(nextValue as ForecastModel)}
           />
         </Stack>
       </Card>

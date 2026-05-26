@@ -19,9 +19,10 @@ class ForecastJobService:
         user_id: UUID,
         oil_series_id: UUID | None,
         units: str | None,
+        forecast_model: str | None = None,
     ) -> ForecastJob | None:
         return await self.forecast_job_repository.find_latest_completed_matching(
-            user_id, oil_series_id, units
+            user_id, oil_series_id, units, forecast_model
         )
 
     async def get_user_jobs(self, user_id: UUID, limit: int, offset: int) -> list[ForecastJob]:

@@ -42,8 +42,9 @@ class ForecastJobRepository:
         user_id: UUID,
         oil_series_id: UUID | None,
         units: str | None,
+        forecast_model: str | None = None,
     ) -> ForecastJob | None:
-        result = await self.session.execute(
+        query = (
             select(ForecastJob)
             .where(
                 ForecastJob.user_id == user_id,
@@ -54,6 +55,9 @@ class ForecastJobRepository:
             .order_by(ForecastJob.created_at.desc())
             .limit(1)
         )
+        if forecast_model is not None:
+            query = query.where(ForecastJob.forecast_model == forecast_model)
+        result = await self.session.execute(query)
         return result.scalars().first()
 
     async def get_user_jobs(self, user_id: UUID, limit: int, offset: int) -> list[ForecastJob]:

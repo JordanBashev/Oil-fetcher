@@ -23,9 +23,10 @@ class GetLatestMatchingForecastUseCase:
         user_id: UUID,
         oil_series_id: UUID | None,
         units: str | None,
+        forecast_model: str | None = None,
     ) -> ForecastJobResponse | None:
         forecast_job = await self.forecast_job_service.find_latest_completed_matching(
-            user_id, oil_series_id, units
+            user_id, oil_series_id, units, forecast_model
         )
         if forecast_job is None:
             return None

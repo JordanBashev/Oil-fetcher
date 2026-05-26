@@ -2,7 +2,7 @@ from app.utils.forecasting.holt_winters import holt_winters_forecast
 from app.utils.forecasting.linear_regression import linear_regression_forecast
 from app.utils.forecasting.types import ForecastFunction, ForecastModelType
 
-LINEAR_REGRESSION_HISTORY_WEEKS = 104
+LINEAR_REGRESSION_HISTORY_WEEKS = 12
 HOLT_WINTERS_HISTORY_WEEKS = 156
 SYSTEM_FORECAST_HORIZON_WEEKS = 8
 

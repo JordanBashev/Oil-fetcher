@@ -7,6 +7,7 @@ import {
   getForecastRequest,
   getLatestMatchingForecastRequest,
   listForecastsRequest,
+  type ForecastModel,
   type ForecastTarget,
   type ListForecastsParams,
 } from "@/api/forecasts";
@@ -21,8 +22,8 @@ function detailKey(forecastId: string) {
   return [...FORECASTS_QUERY_KEY, "detail", forecastId] as const;
 }
 
-function latestMatchingKey(target: ForecastTarget) {
-  return [...FORECASTS_QUERY_KEY, "latest-matching", target] as const;
+function latestMatchingKey(target: ForecastTarget, forecastModel?: ForecastModel) {
+  return [...FORECASTS_QUERY_KEY, "latest-matching", target, forecastModel ?? null] as const;
 }
 
 export function useForecastList(params: ListForecastsParams) {
@@ -41,10 +42,14 @@ export function useForecast(forecastId: string, options?: { pollMs?: number; ena
   });
 }
 
-export function useLatestMatchingForecast(target: ForecastTarget, enabled: boolean = true) {
+export function useLatestMatchingForecast(
+  target: ForecastTarget,
+  enabled: boolean = true,
+  forecastModel?: ForecastModel,
+) {
   return useQuery({
-    queryKey: latestMatchingKey(target),
-    queryFn: () => getLatestMatchingForecastRequest(target),
+    queryKey: latestMatchingKey(target, forecastModel),
+    queryFn: () => getLatestMatchingForecastRequest(target, forecastModel),
     enabled,
   });
 }

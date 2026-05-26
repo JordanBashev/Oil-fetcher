@@ -20,9 +20,7 @@ def setup_logging() -> None:
     A QueueHandler is installed on the root logger so log calls in request
     handlers are non-blocking (just enqueue + return). A background
     QueueListener thread drains the queue and dispatches each record to
-    the real handlers (console + rotating JSON file). This keeps the event
-    loop responsive even at high concurrency (1000+ simultaneous requests
-    in load tests).
+    the real handlers (console + rotating JSON file).
     """
     global _queue_listener
 

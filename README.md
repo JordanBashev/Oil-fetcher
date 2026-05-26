@@ -161,7 +161,7 @@ A route never wires repositories itself. The route says "I need this use case" v
 - **Every layer is `async def`** — routes, use cases, services, repositories.
 - **SQLAlchemy async session** (`AsyncSession` + `aiosqlite`) — all DB calls are `await`ed.
 - **`BackgroundTasks`** — for fire-and-forget work the client shouldn't wait on (forecast workers, oil fetches triggered by admins).
-- **`QueueHandler` logging** — log calls are non-blocking (just enqueue + return). A background thread drains the queue into the console and file handlers. Tested at 1000+ concurrent requests; logging never blocks the event loop.
+- **`QueueHandler` logging** — log calls are non-blocking (just enqueue + return). A background thread drains the queue into the console and file handlers. logging never blocks the event loop.
 - **Scheduler** — `AsyncIOScheduler` (APScheduler) registers two cron jobs at startup: daily oil fetch (current week) + weekly revision backfill (trailing 6 weeks).
 
 ### Authentication flow
@@ -235,7 +235,7 @@ The check is one extra query in `CreateForecastJobUseCase` before the insert. Im
 
 ### Logging
 
-**Why a QueueHandler?** Synchronous file I/O blocks the event loop. Under load (1000+ concurrent requests), a 1 ms file write becomes catastrophic when multiplied by every log statement. So:
+**Why a QueueHandler?** Synchronous file I/O blocks the event loop. Under load, a 1 ms file write becomes catastrophic when multiplied by every log statement. So:
 
 1. Root logger has **one** handler: a `QueueHandler` that just enqueues the record. Microseconds; never blocks.
 2. A `QueueListener` runs in a background thread, draining the queue and dispatching to:

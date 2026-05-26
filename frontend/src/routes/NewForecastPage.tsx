@@ -61,6 +61,12 @@ export function NewForecastPage() {
     }
   }, [unitsQuery.data, selectedUnit]);
 
+  useEffect(() => {
+    if (selectedSeriesId === null && seriesQuery.data && seriesQuery.data.length > 0) {
+      setSelectedSeriesId(seriesQuery.data[0].id);
+    }
+  }, [seriesQuery.data, selectedSeriesId]);
+
   const target = buildTarget(targetMode, selectedSeriesId, selectedUnit);
   const targetReady = target !== null;
 

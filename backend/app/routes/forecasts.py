@@ -54,10 +54,11 @@ async def list_forecasts(
 @router.get("/latest-matching", response_model=ForecastJobResponse | None)
 async def get_latest_matching_forecast(
     target: ForecastTarget = Depends(),
+    forecast_model: str | None = None,
     current_user: User = Depends(get_current_user),
     use_case: GetLatestMatchingForecastUseCase = Depends(get_latest_matching_forecast_use_case),
 ) -> ForecastJobResponse | None:
-    return await use_case.execute(current_user.id, target.oil_series_id, target.units)
+    return await use_case.execute(current_user.id, target.oil_series_id, target.units, forecast_model)
 
 
 @router.get("/{forecast_job_id}", response_model=ForecastJobResponse)
