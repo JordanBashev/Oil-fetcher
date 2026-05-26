@@ -1,0 +1,16 @@
+fastapi[standard]
+sqlalchemy
+alembic
+aiosqlite
+greenlet
+pydantic[email]
+pydantic-settings
+python-jose[cryptography]
+bcrypt
+httpx
+apscheduler
+slowapi
+numpy
+statsmodels
+pytest
+pytest-asyncio

@@ -1,0 +1,47 @@
+#!/usr/bin/env sh
+set -e
+
+COMMAND=$1
+shift
+
+case "$COMMAND" in
+  migrate)
+    echo "Running migrations..."
+    alembic upgrade head
+    ;;
+  downgrade)
+    REVISION=${1:-"-1"}
+    echo "Downgrading to: $REVISION"
+    alembic downgrade "$REVISION"
+    ;;
+  generate)
+    MIGRATION_NAME="migration_$(date +%Y%m%d_%H%M%S)"
+    echo "Generating migration: $MIGRATION_NAME"
+    alembic revision --autogenerate -m "$MIGRATION_NAME"
+    ;;
+  seed)
+    echo "Running seeders..."
+    python -m app.database.seeders.run
+    ;;
+  reset)
+    echo "Removing ./data ..."
+    rm -rf ./data
+    echo "Running migrations..."
+    alembic upgrade head
+    echo "Running seeders..."
+    python -m app.database.seeders.run
+    ;;
+  *)
+    echo "Unknown command: $COMMAND"
+    echo ""
+    echo "Usage: bin/db <command>"
+    echo ""
+    echo "Commands:"
+    echo "  migrate              Apply all pending migrations"
+    echo "  downgrade [rev]      Downgrade one step, or pass a revision to go to a specific one"
+    echo "  generate             Auto-generate a new migration from model changes"
+    echo "  seed                 Run all seeders"
+    echo "  reset                Delete ./data, then migrate + seed (destructive)"
+    exit 1
+    ;;
+esac
