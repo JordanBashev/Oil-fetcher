@@ -28,7 +28,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isAdmin = user?.role === ADMIN_ROLE_NAME;
+  const isAdmin = user?.roles.includes(ADMIN_ROLE_NAME) ?? false;
   const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
 
   const handleLogout = async () => {
@@ -56,7 +56,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           {user && (
             <Group gap="sm">
               <Text size="sm" c="dimmed">
-                {user.email} ({user.role})
+                {user.email}
               </Text>
               <Button size="xs" variant="default" onClick={handleLogout} loading={logout.isPending}>
                 Sign out

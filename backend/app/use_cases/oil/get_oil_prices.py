@@ -51,15 +51,18 @@ class GetOilPricesUseCase:
         filters: OilPriceRecordFilters,
         matched_series_count: int,
     ) -> OilPricesResponse:
-        records = await self.oil_price_record_service.get_records(filters)
+        per_series_filters = filters.model_copy(update={"units": None})
+        records = await self.oil_price_record_service.get_records(per_series_filters)
         points_by_series: dict[UUID, list[OilPricePoint]] = {}
         for record in records:
             series_points = points_by_series.setdefault(record.oil_series_id, [])
             series_points.append(OilPricePoint(period=record.period, value=record.value))
 
+        unit_label: str | None = None
         series_list = []
         for oil_series_id, points in points_by_series.items():
             oil_series = await self.oil_series_service.get_by_id(oil_series_id)
+            unit_label = oil_series.units
             series_list.append(
                 OilPriceSeries(
                     series_code=oil_series.series,
@@ -73,6 +76,6 @@ class GetOilPricesUseCase:
             matched_series_count=matched_series_count,
             date_from=filters.date_from,
             date_to=filters.date_to,
-            unit_label=filters.units,
+            unit_label=unit_label,
             series=series_list,
         )

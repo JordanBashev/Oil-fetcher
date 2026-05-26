@@ -23,9 +23,14 @@ case "$COMMAND" in
     echo "Running seeders..."
     python -m app.database.seeders.run
     ;;
+  test)
+    echo "Running pytest..."
+    pytest "./tests/"
+    ;;
   reset)
-    echo "Removing ./data ..."
-    rm -rf ./data
+    echo "Clearing ./data ..."
+    rm -rf ./data/* ./data/.[!.]*
+    mkdir -p ./data
     echo "Running migrations..."
     alembic upgrade head
     echo "Running seeders..."
@@ -34,13 +39,14 @@ case "$COMMAND" in
   *)
     echo "Unknown command: $COMMAND"
     echo ""
-    echo "Usage: bin/db <command>"
+    echo "Usage: bin/commands <command>"
     echo ""
     echo "Commands:"
     echo "  migrate              Apply all pending migrations"
     echo "  downgrade [rev]      Downgrade one step, or pass a revision to go to a specific one"
     echo "  generate             Auto-generate a new migration from model changes"
     echo "  seed                 Run all seeders"
+    echo "  test [args...]       Run pytest (extra args forwarded). Can only be ran locally, not in docker"
     echo "  reset                Delete ./data, then migrate + seed (destructive)"
     exit 1
     ;;

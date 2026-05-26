@@ -4,7 +4,7 @@ export type User = {
   id: number;
   email: string;
   created_at: string;
-  role: string;
+  roles: string[];
 };
 
 export type AuthSuccess = {

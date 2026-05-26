@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class AuthUserResponse(BaseModel):
     id: UUID
     email: str
-    role: str
+    roles: list[str] = []
 
 
 class AuthResponse(BaseModel):

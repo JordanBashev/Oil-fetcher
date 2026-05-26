@@ -14,4 +14,4 @@ class OilPriceRecordFilters(BaseModel):
     duoarea: str | None = None
     product: str | None = None
     process: str | None = None
-    units: str = DEFAULT_OIL_UNIT
+    units: str | None = None

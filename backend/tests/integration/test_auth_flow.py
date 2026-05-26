@@ -19,7 +19,7 @@ async def test_register_creates_user_and_sets_cookies(test_session: AsyncSession
     assert response.status_code == 201
     body = response.json()
     assert body["user"]["email"] == DEFAULT_TEST_EMAIL
-    assert body["user"]["role"] == "user"
+    assert body["user"]["roles"] == ["user"]
     assert ACCESS_TOKEN_COOKIE_NAME in response.cookies
     assert REFRESH_TOKEN_COOKIE_NAME in response.cookies
 

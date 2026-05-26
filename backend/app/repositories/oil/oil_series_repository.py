@@ -3,6 +3,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.database.models.oil.oil_price_record import OilPriceRecord
 from app.database.models.oil.oil_series import OilSeries
 
 
@@ -11,12 +12,19 @@ class OilSeriesRepository:
         self.session = session
 
     async def get_all(self) -> list[OilSeries]:
-        result = await self.session.execute(select(OilSeries).order_by(OilSeries.series.asc()))
+        result = await self.session.execute(
+            select(OilSeries)
+            .where(OilSeries.id.in_(select(OilPriceRecord.oil_series_id).distinct()))
+            .order_by(OilSeries.series.asc())
+        )
         return list(result.scalars().all())
 
     async def get_distinct_units(self) -> list[str]:
         result = await self.session.execute(
-            select(OilSeries.units).distinct().order_by(OilSeries.units.asc())
+            select(OilSeries.units)
+            .where(OilSeries.id.in_(select(OilPriceRecord.oil_series_id).distinct()))
+            .distinct()
+            .order_by(OilSeries.units.asc())
         )
         return list(result.scalars().all())
 

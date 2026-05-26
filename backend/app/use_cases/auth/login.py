@@ -39,13 +39,13 @@ class LoginUseCase:
             logger.warning(LOGIN_FAILED_USER_INACTIVE, user.id)
             raise http_error(USER_INACTIVE)
 
-        role_name = await self.user_role_service.get_primary_role_name(user.id)
+        role_names = await self.user_role_service.get_role_names(user.id)
         logger.info(LOGIN_SUCCESS, user.id)
 
         return AuthResponse(
             user=AuthUserResponse(
                 id=user.id,
                 email=user.email,
-                role=role_name,
+                roles=role_names,
             )
         )

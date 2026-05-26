@@ -93,7 +93,7 @@ class RunForecastJobUseCase:
         filters = OilPriceRecordFilters(
             dataset_version_id=forecast_job.dataset_version_id,
             oil_series_id=forecast_job.oil_series_id,
-            units=forecast_job.units or DEFAULT_OIL_UNIT,
+            units=None if forecast_job.oil_series_id is not None else (forecast_job.units or DEFAULT_OIL_UNIT),
         )
 
         if forecast_job.oil_series_id is not None:

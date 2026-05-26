@@ -13,7 +13,17 @@ Full-stack web app for visualizing historical oil prices and generating reproduc
 
 ## Quickstart
 
-### 1. Configure environment
+### 1. Set up the Python venv
+
+```sh
+python -m venv .venv           # Inside backend
+.venv/Scripts/Activate.ps1     # Windows; or: source .venv/bin/activate
+pip install -r backend/requirements.txt
+```
+
+Keep the venv activated in any terminal where you run `bin/commands.ps1`, `pytest`, or other host-side Python commands.
+
+### 2. Configure environment
 
 ```sh
 cp backend/.env.example backend/.env
@@ -24,7 +34,7 @@ Edit `backend/.env` and set:
 - `EIA_API_KEY` — get one free at <https://www.eia.gov/opendata/register.php>. A working dev key is also kept at `./apiKeyEIAGOV` in this repo.
 - `SECRET_KEY` — any long random string.
 
-### 2. Start the stack
+### 3. Start the stack
 
 ```sh
 docker compose up -d --build
@@ -37,25 +47,25 @@ Both services come up:
 
 The containers start **empty** — no schema, no data yet.
 
-### 3. Initialize the database
+### 4. Initialize the database
 
 In a separate terminal:
 
 ```sh
-bin/db migrate    # apply Alembic migrations
-bin/db seed       # seed users + 5-year EIA history (~30s)
+bin/docker migrate    # apply Alembic migrations
+bin/docker seed       # seed users + 5-year EIA history (~30s)
 ```
 
 On **Windows / PowerShell**, use the `.ps1` wrapper instead.
 
 ```powershell
-bin/db.ps1 migrate
-bin/db.ps1 seed
+bin/docker.ps1 migrate
+bin/docker.ps1 seed
 ```
 
 Both are idempotent — re-running them is safe.
 
-### 4. Open the app
+### 5. Open the app
 
 <http://localhost:3000>
 
@@ -81,8 +91,8 @@ pip install -r backend/requirements.txt
 
 cd backend
 $env:PYTHONIOENCODING="utf-8"   # Windows: prevents the FastAPI CLI emoji crash
-bash bin/db migrate
-bash bin/db seed
+bash bin/docker migrate
+bash bin/docker seed
 fastapi dev app/main.py --host 0.0.0.0 --port 8000
 ```
 
@@ -98,24 +108,28 @@ Vite serves on `http://localhost:3000` and proxies `/api/*` to `http://127.0.0.1
 
 ### Tests
 
+Tests run on the host (the `tests/` folder is not shipped into the Docker image), so the venv must be activated first.
+
 ```sh
+.venv/Scripts/Activate.ps1     # Windows; or: source .venv/bin/activate
 cd backend
-pytest
+bin/commands.ps1 test          # Windows
+# or: bash bin/commands test   # POSIX
 ```
 
 ---
 
-## DB management commands
+## Container commands
 
-`bin/db` (POSIX shell) and `bin/db.ps1` (PowerShell, for Windows users) at the **project root** are thin wrappers that forward to `docker compose exec backend bin/db ...` — so the same verbs work in and out of Docker, on any OS.
+`bin/docker` (POSIX shell) and `bin/docker.ps1` (PowerShell, for Windows users) at the **project root** are thin wrappers that forward to `docker compose exec backend bin/commands ...` — so the same verbs work in and out of Docker, on any OS.
 
 | Command | Effect |
 |---|---|
-| `bin/db migrate` | Apply pending migrations (`alembic upgrade head`) |
-| `bin/db downgrade [rev]` | Revert one revision (or to a specific one) |
-| `bin/db generate` | Autogenerate a migration from model changes |
-| `bin/db seed` | Run seeders (idempotent — skips users/datasets that already exist) |
-| `bin/db reset` | **Destructive**. Wipes `./data`, then migrate + seed |
+| `bin/docker migrate` | Apply pending migrations (`alembic upgrade head`) |
+| `bin/docker downgrade [rev]` | Revert one revision (or to a specific one) |
+| `bin/docker generate` | Autogenerate a migration from model changes |
+| `bin/docker seed` | Run seeders (idempotent — skips users/datasets that already exist) |
+| `bin/docker reset` | **Destructive**. Wipes `./data`, then migrate + seed |
 
 ---
 
@@ -297,7 +311,7 @@ Three Alembic migrations:
 - `0002_oil_tables` — oil_series, dataset_versions, oil_price_records.
 - `0003_forecast_tables` — forecast_jobs, forecast_points + status enum.
 
-Run with `bin/db migrate`. They are not auto-applied at container startup — explicit step, so a misconfigured environment doesn't accidentally `DROP TABLE`.
+Run with `bin/docker migrate`. They are not auto-applied at container startup — explicit step, so a misconfigured environment doesn't accidentally `DROP TABLE`.
 
 ### Seeders
 
@@ -335,10 +349,10 @@ Built with **Mantine** (component library) + **TanStack Query** (server-state) +
 ```
 project root/
 ├── docker-compose.yml          backend + frontend services, single SQLite volume
-├── bin/db                      host-side wrapper → docker compose exec backend bin/db ...
+├── bin/docker                  host-side wrapper → docker compose exec backend bin/commands ...
 ├── backend/
 │   ├── Dockerfile              python:3.11-slim + uvicorn
-│   ├── bin/db                  container-side: alembic + seeders
+│   ├── bin/commands            container-side: alembic + seeders + pytest
 │   ├── alembic/                migrations (0001 / 0002 / 0003)
 │   └── app/
 │       ├── main.py             FastAPI app, CORS, lifespan (scheduler), /health

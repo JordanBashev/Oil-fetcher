@@ -30,13 +30,6 @@ class UserRoleService:
                 role_names.append(role.name)
         return role_names
 
-    async def get_primary_role_name(self, user_id: UUID) -> str:
-        user_roles = await self.user_role_repository.get_roles_by_user_id(user_id)
-        if not user_roles:
-            return ""
-        role = await self.role_repository.get_by_id(user_roles[0].role_id)
-        return role.name if role is not None else ""
-
     async def assign_role(self, user_role: UserRole) -> UserRole:
         return await self.user_role_repository.assign_role(user_role)
 

@@ -53,13 +53,13 @@ class RefreshUseCase:
             samesite=COOKIE_SAMESITE,
         )
 
-        role_name = await self.user_role_service.get_primary_role_name(user.id)
+        role_names = await self.user_role_service.get_role_names(user.id)
         logger.info(REFRESH_SUCCESS, user.id)
 
         return AuthResponse(
             user=AuthUserResponse(
                 id=user.id,
                 email=user.email,
-                role=role_name,
+                roles=role_names,
             )
         )

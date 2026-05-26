@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# Host-side wrapper: forwards `bin/docker <command>` to the backend container's
+# bin/commands script. Lets developers run container commands from the project
+# root without typing `docker compose exec backend ...` every time.
+set -e
+
+exec docker compose exec backend bin/commands "$@"

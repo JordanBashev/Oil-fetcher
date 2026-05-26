@@ -65,6 +65,6 @@ class RegisterUseCase:
             user=AuthUserResponse(
                 id=user.id,
                 email=user.email,
-                role=default_role.name,
+                roles=[default_role.name],
             )
         )
